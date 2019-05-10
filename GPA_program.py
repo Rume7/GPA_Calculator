@@ -34,7 +34,7 @@ class Course(object):
         else:              return 0.0
 
     def __str__(self):
-        print('Course name:', self.name)
+        print(self.course.name)
 
 
 class Student(object):
@@ -74,68 +74,91 @@ class Student(object):
     def get_GPA(self):
         total_points = 0.0
         total_course_unit = 0
-        for each_course in list(self.get_course_taken()):
+        for each_course in self.get_course_taken():
             aCourse = Course(each_course)
             score = self.get_score_for_course(aCourse.get_course_name())
             grade = aCourse.get_grade(score)
             points = aCourse.get_grade_point(grade)
-            print(score, grade, points)
             total_course_unit += aCourse.get_course_unit()
             total_points += (points * aCourse.get_course_unit())
-        self.gpa = total_points/total_course_unit
+        self.gpa = total_points/ total_course_unit
         return self.gpa
 
+    def __str__(self):
+        print(self.get_student_name())
 
-## Create the Course objects
-course_unit = 3
-course1 = Course("MIT801", course_unit)
-course2 = Course("MIT802", course_unit)
-course3 = Course("MIT803", course_unit)
-course4 = Course("MIT815", course_unit)
-course5 = Course("MIT821", course_unit)
+## A function that opens a text file and reads it to determine the
+## students name, matric number, courses and the score for the courses.
+## Input file format: S/N  Name Matric Num Course1, ..., Course5 Unit. 
+## Output file format: S/N Name Matric Num CGPA
 
-## Create a Student object
-no_of_courses = 5
-student1 = Student("Jerry Momodu", "MIT01012019", no_of_courses)
-student1.add_course(course1)
-student1.add_course(course2)
-student1.add_course(course3)
-student1.add_course(course4)
-student1.add_course(course5)
-
-## Set score for each course
-student1.set_score_for_course(course1, 59)
-student1.set_score_for_course(course2, 67)
-student1.set_score_for_course(course3, 77)
-student1.set_score_for_course(course4, 77)
-student1.set_score_for_course(course5, 97)
-
-print(student1.get_student_name(), ": GPA =", student1.get_GPA(), "\n")
-
-## Write the function that opens a text file and reads it to determine the
-## students name, courses and the score for the courses.
-## Input file format: S/N  Name Matric Num Course1, ..., Course 5 Unit, GPA CGPA
-## Output file format: S/N Name  Matric Num  CGPA
-
-def main(filename):
+def main(input_file, txt_output_file):
+    course_unit = 3
     try:
-        opened_file = open(filename, 'r')
+        opened_file = open(input_file, 'r')
+        output_file = open(txt_output_file, 'w')
         if opened_file.mode == 'r':
             file_lines_in_list = opened_file.readlines()
+            ## Read line one of the input file to create student data
+            ## index 0 to 3
+            student_data = file_lines_in_list[0].split()[0:4]
+            student_serial = student_data[0]
+            first_name = student_data[1]
+            last_name = student_data[2]
+            full_name = first_name + ' ' + last_name
+            matric_num = student_data[3]
+
+            # Print header to output file
+            print(student_serial, '\t', 'FULL  NAME', '\t\t', matric_num, '\t', 'GPA',\
+                   file=output_file)
+            
+            ## Reading line one of the input file to create course object
+            ## index 4 to 9
+            courses = file_lines_in_list[0].split()[4:9]
+            course_unit = file_lines_in_list[0].split()[9]
+            
+            course_obj1 = Course(courses[0], course_unit)
+            course_obj2 = Course(courses[1], course_unit)
+            course_obj3 = Course(courses[2], course_unit)
+            course_obj4 = Course(courses[3], course_unit)
+            course_obj5 = Course(courses[4], course_unit)
+
             ## Start reading from line 2 because line 1 contains header
             for each_line in file_lines_in_list[1:]:
-                #print(each_line, each_line.split())
-                print(each_line.split())
+                student_record = each_line.split()   # Scores of five courses
+                (student_sn, student_name, student_matric_num) = student_record[0], \
+                                student_record[1] + ' ' + student_record[2], student_record[3]
+                student_scores = student_record[4:9]
 
-                ## Create 5 course objects and a student object
-                ## Set score for each course
-                ## Call the print(student.get_student_name(), student.get_GPA())
+                ## Create a student object and set scores for each course
+                master_student = Student(student_name, student_matric_num, len(courses))
+
+                ## Add courses to student object
+                master_student.add_course(course_obj1)
+                master_student.add_course(course_obj2)
+                master_student.add_course(course_obj3)
+                master_student.add_course(course_obj4)
+                master_student.add_course(course_obj5)
                 
-            
-filename="C:\\Users\\E238958\\Desktop\\testing_git\\Invent with Python\\input.txt"
-main(filename)
+                master_student.set_score_for_course(course_obj1, int(student_scores[0]))
+                master_student.set_score_for_course(course_obj2, int(student_scores[1]))
+                master_student.set_score_for_course(course_obj3, int(student_scores[2]))
+                master_student.set_score_for_course(course_obj4, int(student_scores[3]))
+                master_student.set_score_for_course(course_obj5, int(student_scores[4]))
 
-
-
-
+                ## Add tabs and indent properly and send to output file.
+                print(student_sn, '\t', master_student.get_student_name().ljust(20), '\t',\
+                      master_student.get_matric_num().rjust(10), '\t', '{:2.2f}'.format(float(master_student.get_GPA())),\
+                      file = output_file)
+                
+                ## Close out.
+            output_file.close()
+    except ZeroDivisionError as f:
+        print(f)
+    except ValueError as e:
+        print("Problem with code:", e)
         
+filename="Choose input file"
+output = "Choose output file"
+main(filename, output)
+
