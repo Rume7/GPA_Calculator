@@ -1,0 +1,5 @@
+S/N 	 FULL  NAME 		 MATRIC_NUMBER 	 GPA
+1 	 JERRY MOMODU         	   19030202 	 4.60
+2 	 SANDR BAY            	   19030203 	 4.20
+3 	 FERRY MARY           	   19030204 	 4.60
+4 	 GARY BARYWHITE       	   19030205 	 3.80
