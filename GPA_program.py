@@ -1,7 +1,7 @@
 ## Create a Course object
 
 class Course(object):
-    def __init__(self, course_name, course_unit=3):
+    def __init__(self, course_name, course_unit):
         self.course_name = course_name
         self.course_unit = course_unit
 
@@ -34,17 +34,20 @@ class Course(object):
         else:              return 0.0
 
     def __str__(self):
-        print(self.course.name)
+        return str(self.course.name)
 
 
 class Student(object):
-    def __init__(self, name, matric_num, num_of_courseTaken=5):
+    
+    courseTaken = 0
+    
+    def __init__(self, name, matric_num):
         self.name = name
         self.matric_num  = matric_num
-        self.courseTaken = num_of_courseTaken
         self.list_of_courses = []
         self.gpa = 0.0
         self.student_scores = {}
+        Student.courseTaken += 1
 
     def get_student_name(self):
         return self.name
@@ -53,14 +56,15 @@ class Student(object):
         return self.matric_num
 
     def get_num_of_coursesTaken(self):
-        return self.num_of_courseTaken
+        return Student.courseTaken
 
     def get_course_taken(self):
         return self.list_of_courses
 
     def add_course(self, Course):
-        """Course is a list of tuples of course name, score and units."""
-        self.list_of_courses.append(Course.get_course_name())
+        """Course is a list of tuples of course name and it units."""
+        new_course = (Course.get_course_name(), Course.get_course_unit())
+        self.list_of_courses.append(new_course)
 
     def set_score_for_course(self, Course, score):
         self.student_scores[Course.get_course_name()] = score
@@ -74,18 +78,21 @@ class Student(object):
     def get_GPA(self):
         total_points = 0.0
         total_course_unit = 0
-        for each_course in self.get_course_taken():
-            aCourse = Course(each_course)
+        # You're running over a list of tuples.
+        for each_course in self.get_course_taken():     
+            course_title = each_course[0]
+            course_unit = each_course[1]
+            aCourse = Course(course_title, course_unit)
             score = self.get_score_for_course(aCourse.get_course_name())
             grade = aCourse.get_grade(score)
             points = aCourse.get_grade_point(grade)
-            total_course_unit += aCourse.get_course_unit()
+            total_course_unit += int(aCourse.get_course_unit())
             total_points += (points * aCourse.get_course_unit())
         self.gpa = total_points/ total_course_unit
         return self.gpa
 
     def __str__(self):
-        print(self.get_student_name())
+        return str(self.get_student_name())
 
 ## A function that opens a text file and reads it to determine the
 ## students name, matric number, courses and the score for the courses.
@@ -94,6 +101,7 @@ class Student(object):
 
 def main(input_file, txt_output_file):
     course_unit = 3
+    project_unit = 6
     try:
         opened_file = open(input_file, 'r')
         output_file = open(txt_output_file, 'w')
@@ -114,24 +122,34 @@ def main(input_file, txt_output_file):
             
             ## Reading line one of the input file to create course object
             ## index 4 to 9
-            courses = file_lines_in_list[0].split()[4:9]
-            course_unit = file_lines_in_list[0].split()[9]
+            courses = file_lines_in_list[0].split()[4:14]
+            #course_unit = file_lines_in_list[0].split()[9]
+            project_code = file_lines_in_list[0].split()[15]
+            #project_unit = file_lines_in_list[0].split()[11]  returns the string 'UNIT'
             
-            course_obj1 = Course(courses[0], course_unit)
-            course_obj2 = Course(courses[1], course_unit)
-            course_obj3 = Course(courses[2], course_unit)
-            course_obj4 = Course(courses[3], course_unit)
-            course_obj5 = Course(courses[4], course_unit)
+            course_obj1 = Course(courses[0], int(course_unit))
+            course_obj2 = Course(courses[1], int(course_unit))
+            course_obj3 = Course(courses[2], int(course_unit))
+            course_obj4 = Course(courses[3], int(course_unit))
+            course_obj5 = Course(courses[4], int(course_unit))
+            course_obj6 = Course(courses[5], int(course_unit))
+            course_obj7 = Course(courses[6], int(course_unit))
+            course_obj8 = Course(courses[7], int(course_unit))
+            course_obj9 = Course(courses[8], int(course_unit))
+            course_obj10 = Course(courses[9], int(course_unit))
+            course_proj = Course(project_code, int(project_unit))
 
             ## Start reading from line 2 because line 1 contains header
             for each_line in file_lines_in_list[1:]:
                 student_record = each_line.split()   # Scores of five courses
                 (student_sn, student_name, student_matric_num) = student_record[0], \
                                 student_record[1] + ' ' + student_record[2], student_record[3]
-                student_scores = student_record[4:9]
+                student_scores = student_record[4:14]
+                student_project_score = student_record[15]
+                student_project_unit = student_record[16]
 
                 ## Create a student object and set scores for each course
-                master_student = Student(student_name, student_matric_num, len(courses))
+                master_student = Student(student_name, student_matric_num)
 
                 ## Add courses to student object
                 master_student.add_course(course_obj1)
@@ -139,12 +157,24 @@ def main(input_file, txt_output_file):
                 master_student.add_course(course_obj3)
                 master_student.add_course(course_obj4)
                 master_student.add_course(course_obj5)
+                master_student.add_course(course_obj6)
+                master_student.add_course(course_obj7)
+                master_student.add_course(course_obj8)
+                master_student.add_course(course_obj9)
+                master_student.add_course(course_obj10)
+                master_student.add_course(course_proj)      # Adding project to list of courses
                 
                 master_student.set_score_for_course(course_obj1, int(student_scores[0]))
                 master_student.set_score_for_course(course_obj2, int(student_scores[1]))
                 master_student.set_score_for_course(course_obj3, int(student_scores[2]))
                 master_student.set_score_for_course(course_obj4, int(student_scores[3]))
                 master_student.set_score_for_course(course_obj5, int(student_scores[4]))
+                master_student.set_score_for_course(course_obj6, int(student_scores[5]))
+                master_student.set_score_for_course(course_obj7, int(student_scores[6]))
+                master_student.set_score_for_course(course_obj8, int(student_scores[7]))
+                master_student.set_score_for_course(course_obj9, int(student_scores[8]))
+                master_student.set_score_for_course(course_obj10, int(student_scores[9]))
+                master_student.set_score_for_course(course_proj, int(student_project_score))
 
                 ## Add tabs and indent properly and send to output file.
                 print(student_sn, '\t', master_student.get_student_name().ljust(20), '\t',\
@@ -158,7 +188,9 @@ def main(input_file, txt_output_file):
     except ValueError as e:
         print("Problem with code:", e)
         
-filename="Choose input file"
-output = "Choose output file"
+filename="...\\input.txt"
+output = "...\\output2.txt"
 main(filename, output)
+
+
 
