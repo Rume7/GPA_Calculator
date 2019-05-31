@@ -29,6 +29,9 @@ def get_points_for_course(grade):
 
     
 def get_CGPA(list_of_scores, unit_of_course, project_score, project_unit):
+    '''
+        This method computes the cumulative grade point average.
+    '''
     total_points = 0
     total_course_units = 0
     for score in list_of_scores:
@@ -47,6 +50,9 @@ def get_CGPA(list_of_scores, unit_of_course, project_score, project_unit):
 
 
 def publishing_header(serial, name, matric, title, output_file):
+    '''
+        This method print the header of the file in the output file.
+    '''
     try:
         result_file = open(output_file, 'a')
         print(serial, name.ljust(25), matric.ljust(18), title, file = result_file)
@@ -57,6 +63,10 @@ def publishing_header(serial, name, matric, title, output_file):
 
         
 def publish_to_output_file(serial_num, full_name, matric_number, cgpa, output_file):
+    '''
+        This method print the student serial, full name, matric number and CGPA to
+        the output file.
+    '''
     try:
         result_file = open(output_file, 'a')
         print(serial_num.ljust(3), full_name.ljust(28), matric_number, '\t', 
@@ -68,6 +78,12 @@ def publish_to_output_file(serial_num, full_name, matric_number, cgpa, output_fi
                 
 
 def process_csv_file(input_file, result_file):
+    '''
+        This method process the input file.
+        The first try block check the existence of the result file and deletes it
+        if it exists. This is necessary as the publish method appends data to the
+        existing file.
+    '''
     try:
         file_exists = os.path.isfile(result_file)
         if file_exists:
